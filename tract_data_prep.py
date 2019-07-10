@@ -1,7 +1,6 @@
 # IMPORTS
 import geopandas as gpd
 import pandas as pd
-import matplotlib.pyplot as plt
 import requests
 from fips import state_fips
 
@@ -10,6 +9,7 @@ HOST = "https://api.census.gov/data"
 def tract_data_prep(st, year, cache = True):
     
     st = st.lower()
+    year = str(year)
     
     if st not in state_fips:
         raise Exception("You attempted to prepare data for '{}', which is not a valid state postal code.".format(st))
