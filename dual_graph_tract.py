@@ -19,6 +19,10 @@ def make_dual_graph(st):
     Arguments:
     st -- 2 letter state postal code
     """
+    
+    # Fold state postal code to lowercase:
+    st = st.lower()
+    
     ##2016 Census Tract- TigerLine File for the appropriate state, follow link to download
     geo = gpd.read_file("./data/"+st+"_tract.shp")
     graph = Graph.from_geodataframe(geo) #if graph is successfully generated, we should be able to run chain
