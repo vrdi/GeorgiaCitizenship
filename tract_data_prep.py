@@ -111,13 +111,14 @@ def tract_data_prep(st, year, cache = True):
     # Save to file
     df_final.to_pickle("data/df_final.pickle")    
     
-    # Download Census Tract- TigerLine File for requested state and year
-    
+    # Download Census Tract- TigerLine File for requested state and year    
+    tiger_fn = "tl_" + year + "_" + state_fips[st] +"_tract"
     try:
-        geo_tract = gpd.read_file("data/" + st + "_tract.shp")
+        geo_tract = gpd.read_file("data/" + tiger_fn + ".shp")
     except:
         print("Downloading shapefile from Census")
-        geo_tract = gpd.read_file("https://www2.census.gov/geo/tiger/TIGER" + year + "/TRACT/tl_" + year + "_" + state_fips[st] +"_tract.zip")
+        geo_tract = gpd.read_file("https://www2.census.gov/geo/tiger/TIGER" + year + "/TRACT/" + tiger_fn + ".zip")
+        geo_tract.to_file("data/" + tiger_fn + ".shp")        
     else:
         print("Reading shapefile from cache")
 
