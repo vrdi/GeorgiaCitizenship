@@ -1,14 +1,15 @@
 ---
- Title: Georgia Citizenship Project
- Author: 
- - Kat Henneberger
- - Maira Khan
- - Brian Morris
- - Jasmine Noory
- - Qi Wan Sim
- - Bri White
- - Sarah Cannon (adviser)
- - Lee Hachadoorian (adviser)
+title: Georgia Citizenship Project
+author: 
+- Kat Henneberger
+- Maira Khan
+- Brian Morris
+- Jasmine Noory
+- Qi Wan Sim
+- Bri White
+- Sarah Cannon (adviser)
+- Lee Hachadoorian (adviser)
+date: July 12, 2019
 ---
 
 # Introduction
