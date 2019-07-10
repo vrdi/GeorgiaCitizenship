@@ -27,7 +27,7 @@ col_names = ["TOTPOP", "WPOP", "BPOP","AMINPOP", "ASIANPOP", "NHPIPOP","OTHERPOP
 
 # Non citizenship data
 get_vars.append("B05001_006E")
-col_names_2 = "NCVAP"
+col_names_2 = "NCPOP"
 
 col_names.append(col_names_2)
 
@@ -58,7 +58,8 @@ df[data_cols] = df[data_cols].astype(int)
 #fix column data types string -> int
 # Citizenship Voting-Age Population
 
-races = [#"A",
+races = ["",
+         #"A",
          "B",
          "C", 
          "D", 
@@ -68,15 +69,13 @@ races = [#"A",
          "H",
          "I"]   
 
-
+races_names = {"":"Total","B":"BLACK","C":"AMIN","D":"ASIAN","H":"NHWHITE", "I":"HISP"}
 
 #Loop over races to get CVAP counts and append to a dataframe. 
 get_var=[]
-df_col_names = ["MNative", "MNat", "FNative","FNat", "state", 'county', "tract"]
+df_col_names = ["MNativeBorn", "MNaturalized", "FNativeBorn","FNaturalized"]
 ga_col_names= ['state', 'county', 'tract']
 ga_tract = pd.DataFrame(columns=ga_col_names)
-
-
 
 for race in races:
     get_var= ["B05003" + str(race) + "_" + str(i+1).zfill(3) 
@@ -95,9 +94,16 @@ for race in races:
     
     # Examine the response
     r.text
+    current_col_names =[]
     
-    df_1 = pd.DataFrame(columns=df_col_names, data=r.json()[1:])
-    int_cols = df_col_names[:-3]
+    for i in df_col_names:
+        current_col_names.append(i + races_names[race])
+    print(current_col_names)    
+    
+    current_col_names.extend(ga_col_names)
+    
+    df_1 = pd.DataFrame(columns=current_col_names, data=r.json()[1:])
+    int_cols = current_col_names[:-3]
     df_1[int_cols] = df_1[int_cols].astype(int)
     
     ga_tract['state'] = df_1['state']
@@ -107,18 +113,18 @@ for race in races:
     ga_tract[str(race + '_CVAP' )] = df_1.sum(axis=1)
 
 
-# MERGE df and df_1
-df_final = pd.merge(df , df_1, on = ["tract" , "county","state"])    
+    # MERGE df and df_1
+    df = pd.merge(df , df_1, on = ["tract" , "county","state"])    
 
 # Save to file
-df_final.to_pickle("data/df_final.pickle")    
+df.to_pickle("data/df_final.pickle")    
 
 # Download 2012 Census Tract- TigerLine File for Georgia
 
 geo_tract = gpd.read_file("https://www2.census.gov/geo/tiger/TIGER2012/TRACT/tl_2012_13_tract.zip")
 
 # JOIN DEMOGRAPHIC DATA TO TRACT GEODATAFRAME
-geo = pd.merge(geo_tract, df_final, left_on = ["STATEFP", "COUNTYFP","TRACTCE"], right_on = ["state", "county", "tract"])
+geo = pd.merge(geo_tract, df, left_on = ["STATEFP", "COUNTYFP","TRACTCE"], right_on = ["state", "county", "tract"])
 # EXPORT SHAPEFILE FOR CHAIN
 geo.to_file("data/ga_tract.shp")
 
