@@ -27,7 +27,7 @@ def tract_data_prep(st, year, cache = True):
     
     # Non citizenship data
     get_vars.append("B05001_006E")
-    col_names_2 = "NCVAP"
+    col_names_2 = "NCPOP"
     
     col_names.append(col_names_2)
     
@@ -54,8 +54,9 @@ def tract_data_prep(st, year, cache = True):
     df[data_cols] = df[data_cols].astype(int)
     #fix column data types string -> int
     # Citizenship Voting-Age Population
-    
-    races = [#"A",
+        
+    races = ["",
+             #"A",
              "B",
              "C", 
              "D", 
@@ -64,17 +65,15 @@ def tract_data_prep(st, year, cache = True):
              #"G", 
              "H",
              "I"]   
-    
-    
+        
+    races_names = {"":"Total","B":"BLACK","C":"AMIN","D":"ASIAN","H":"NHWHITE", "I":"HISP"}
     
     #Loop over races to get CVAP counts and append to a dataframe. 
     get_var=[]
-    df_col_names = ["MNative", "MNat", "FNative","FNat", "state", 'county', "tract"]
-    # geoid_col_names = ['state', 'county', 'tract'] # Assigned but not used?
+    df_col_names = ["MNativeBorn", "MNaturalized", "FNativeBorn","FNaturalized"]
+    geoid_col_names = ['state', 'county', 'tract']
     # ga_tract = pd.DataFrame(columns = geoid_col_names) # Assigned but not used?
-    
-    
-    
+        
     for race in races:
         get_var= ["B05003" + str(race) + "_" + str(i+1).zfill(3) 
                   + "E" for i in range(23) if i+1 in [9, 11,20,22] ]
@@ -90,11 +89,16 @@ def tract_data_prep(st, year, cache = True):
         r = requests.get(base_url, params=predicates)
         print("made request")
         
-        # Examine the response
-        r.text
-        
-        df_1 = pd.DataFrame(columns=df_col_names, data=r.json()[1:])
-        int_cols = df_col_names[:-3]
+        current_col_names =[]
+
+        for i in df_col_names:
+            current_col_names.append(i + races_names[race])
+        print(current_col_names)    
+
+        current_col_names.extend(geoid_col_names)
+
+        df_1 = pd.DataFrame(columns=current_col_names, data=r.json()[1:])
+        int_cols = current_col_names[:-3]
         df_1[int_cols] = df_1[int_cols].astype(int)
         
         ## Not clear that ga_tract is being used later - LH
@@ -105,11 +109,11 @@ def tract_data_prep(st, year, cache = True):
         # ga_tract[str(race + '_CVAP' )] = df_1.sum(axis=1)
     
     
-    # MERGE df and df_1
-    df_final = pd.merge(df , df_1, on = ["tract" , "county", "state"])    
+        # MERGE df and df_1
+        df = pd.merge(df , df_1, on = ["tract" , "county", "state"])    
     
     # Save to file
-    df_final.to_pickle("data/df_final.pickle")    
+    df.to_pickle("data/df_" + st + "_" + year + ".pickle")    
     
     # Download Census Tract- TigerLine File for requested state and year    
     tiger_fn = "tl_" + year + "_" + state_fips[st] +"_tract"
@@ -123,7 +127,6 @@ def tract_data_prep(st, year, cache = True):
         print("Reading shapefile from cache")
 
     # JOIN DEMOGRAPHIC DATA TO TRACT GEODATAFRAME
-    geo = pd.merge(geo_tract, df_final, left_on = ["STATEFP", "COUNTYFP","TRACTCE"], right_on = ["state", "county", "tract"])
+    geo = pd.merge(geo_tract, df, left_on = ["STATEFP", "COUNTYFP","TRACTCE"], right_on = ["state", "county", "tract"])
     # EXPORT SHAPEFILE FOR CHAIN
-    geo.to_file("data/" + st + "_tract.shp")
-    
+    geo.to_file("data/" + st + "_" + year + "_tract.shp")
