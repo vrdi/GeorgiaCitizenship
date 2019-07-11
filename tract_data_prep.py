@@ -6,6 +6,8 @@ from fips import state_fips
 
 HOST = "https://api.census.gov/data"
 
+
+
 def tract_data_prep(st, year, cache = True):
     
     st = st.lower()
@@ -70,13 +72,13 @@ def tract_data_prep(st, year, cache = True):
     
     #Loop over races to get CVAP counts and append to a dataframe. 
     get_var=[]
-    df_col_names = ["MNativeBorn", "MNaturalized", "FNativeBorn","FNaturalized"]
+    df_col_names = ["MVAP", "MNativeBornVAP", "MNaturalizedVAP", "FVAP", "FNativeBornVAP","FNaturalizedVAP"]
     geoid_col_names = ['state', 'county', 'tract']
     # ga_tract = pd.DataFrame(columns = geoid_col_names) # Assigned but not used?
         
     for race in races:
         get_var= ["B05003" + str(race) + "_" + str(i+1).zfill(3) 
-                  + "E" for i in range(23) if i+1 in [9, 11,20,22] ]
+                  + "E" for i in range(23) if i+1 in [8, 9, 11, 19, 20,22] ]
         print(get_var)
     
         predicates = {}
@@ -122,11 +124,14 @@ def tract_data_prep(st, year, cache = True):
     except:
         print("Downloading shapefile from Census")
         geo_tract = gpd.read_file("https://www2.census.gov/geo/tiger/TIGER" + year + "/TRACT/" + tiger_fn + ".zip")
-        geo_tract.to_file("data/" + tiger_fn + ".shp")        
+        geo_tract.to_file("data/" + tiger_fn + ".gpkg", driver="GPKG")        
     else:
         print("Reading shapefile from cache")
 
     # JOIN DEMOGRAPHIC DATA TO TRACT GEODATAFRAME
     geo = pd.merge(geo_tract, df, left_on = ["STATEFP", "COUNTYFP","TRACTCE"], right_on = ["state", "county", "tract"])
     # EXPORT SHAPEFILE FOR CHAIN
-    geo.to_file("data/" + st + "_" + year + "_tract.shp")
+    geo.to_file("data/" + st + "_" + year + "_tract.gpkg", driver="GPKG")
+
+if __name__ == "__main__":
+    tract_data_prep('GA', 2012)
