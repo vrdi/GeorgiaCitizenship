@@ -1,4 +1,4 @@
----
+﻿---
 title: Notes on the administrative record about the 2020 census citizenship question
 author: Brian Morris
 date: July 10, 2019
@@ -7,7 +7,7 @@ date: July 10, 2019
 **Summary:** I skimmed through the Department of Commerce administrative
 record related to the issue of adding a question about citizenship to
 the short form 2020 census. I was looking for information about
-“administrative data” that the Census Bureau could potentially pull
+"administrative data" that the Census Bureau could potentially pull
 from other agencies (mainly federal for the citizenship information, but
 agencies on the state and local level do supply other types of
 information) in order to get information about the citizenship status of
@@ -35,7 +35,7 @@ citizenship) might come from.
 
   - Page 67: 2010 census match study
     
-      - “In response to calls from external researchers and the National
+      - "In response to calls from external researchers and the National
         Academies of Science, the Census Bureau developed StARS 1999 to
         research the use of administrative data in decennial census
         operations. StARS 1999 was assembled from six administrative
@@ -45,10 +45,10 @@ citizenship) might come from.
         Certification System (TRACS), (4) Center for Medicare and
         Medicaid Services (CMS) Medicare Enrollment Database (MEDB), (5)
         Indian Health Service (IHS) Patient Registration System, and (6)
-        Selective Service System (SSS) Registration System” (Farber and
+        Selective Service System (SSS) Registration System (Farber and
         Leggieri 2002). In StARS 2000, and for subsequent years, an
         additional source file was added, (7) the HUD Public and Indian
-        Housing Information Center (PIC) file” (82).
+        Housing Information Center (PIC) file" (82).
     
       - Federal and commercial data used in this report (84):
         
@@ -127,10 +127,10 @@ citizenship) might come from.
       - 297: administrative data on citizenship from the Immigration and
         Naturalization Service
     
-      - 299: they “estimated the number of naturalized citizens by age
+      - 299: they "estimated the number of naturalized citizens by age
         group, sex, region of origin, and duration of residence based on
         the number of Office of Immigration Statistics (OIS)
-        naturalization records”
+        naturalization records"
     
       - 302:
 
@@ -162,10 +162,10 @@ citizenship) might come from.
   - Page 468: makes a comparison of 2010 Census and ACS response rates
     *by citizenship status* based on 2010 Numident data
     
-      - Numident: Numerical Identification System, “the Social Security
+      - Numident: Numerical Identification System, "the Social Security
         Administration's computer database file of an abstract of the
         information contained in an application for a United States
-        Social Security number (Form SS-5)” (Wikipedia).
+        Social Security number (Form SS-5)" (Wikipedia).
 
   - Page 536: Census Bureau administrative data inventory
     
