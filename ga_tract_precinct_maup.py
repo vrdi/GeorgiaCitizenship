@@ -39,5 +39,5 @@ tracts[variables] = maup.prorate(
         weights.iloc[weights.nonzero()[0]]
         )
 
-precincts.to_file("ga_2012_tract_precinct")
+tracts.to_file("ga_2012_tract_precinct")
 
