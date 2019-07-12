@@ -23,8 +23,8 @@ Georgia is a state with dynamic political opportunity. The party split is curren
 # National Apportionment
 Details here
 
-# Prisoner reallocation
-# Summary: Research was conducted on the availability of prisoner's origins and their current residence. Prison reallocation In Georgia, inmates are counted towards the population count of district/county they are incarcerated in, not their county of origin. In 2010 there were 20,213 inmates in the Department of Corrections. The ACS does not provide county of origin for the incarcerated population, so pulling together different data sources was necessary. 
+#Prisoner Reallocation
+Summary: Research was conducted on the availability of prisoner's origins and their current residence. Prisoner reallocation varies across states, with California randomly reassigning prisoners across geographies. In Georgia, inmates are counted towards the population count of the district/county they are incarcerated in, not their county of origin. In 2010, there were 20,213 inmates in the Department of Corrections. The American Community Survey does not provide county of origin for the incarcerated population, so pulling together different data sources was necessary.
 
 Data on prisoner origins is made available on the county level by the Georgia Department of Corrections(GDC). 
 
@@ -36,6 +36,7 @@ County of Origin-
 1. Fulton County(2,160 inmates)  12.3% of total inmate population
 2. Dekalb County (1,157 inmates)	6.50%	of total inmate population
 3. Cobb County (1,075	inmates) 6.04%	of total inmate population
+
 ** 2,401		unreported counties of origin
 
 Almost a quarter of the prison population within the state of Georgia derive from two central counties- Fulton & Dekalb County. Both of these counties have Georgia's highest African-American population, at 59%. Prison-based gerrymandering moves minority voting power away from the community, and places it in districts that are usually white, and rural. 
