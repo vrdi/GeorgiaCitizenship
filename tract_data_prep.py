@@ -68,11 +68,11 @@ def tract_data_prep(st, year, cache = True):
              "H",
              "I"]   
         
-    races_names = {"":"Total","B":"BLACK","C":"AMIN","D":"ASIAN","H":"NHWHITE", "I":"HISP"}
+    races_names = {"":"TOT","B":"BLK","C":"AMIN","D":"AS","H":"NHW", "I":"HISP"}
     
     #Loop over races to get CVAP counts and append to a dataframe. 
     get_var=[]
-    df_col_names = ["MVAP", "MNativeBornVAP", "MNaturalizedVAP", "FVAP", "FNativeBornVAP","FNaturalizedVAP"]
+    df_col_names = ["MVAP", "MNVVAP", "MNLVAP", "FVAP", "FNVVAP","FNLVAP"]
     geoid_col_names = ['state', 'county', 'tract']
     # ga_tract = pd.DataFrame(columns = geoid_col_names) # Assigned but not used?
         
@@ -124,14 +124,15 @@ def tract_data_prep(st, year, cache = True):
     except:
         print("Downloading shapefile from Census")
         geo_tract = gpd.read_file("https://www2.census.gov/geo/tiger/TIGER" + year + "/TRACT/" + tiger_fn + ".zip")
-        geo_tract.to_file("data/" + tiger_fn + ".gpkg", driver="GPKG")        
+        #geo_tract.to_file("data/" + tiger_fn + ".gpkg", driver="GPKG") 
+        geo_tract.to_file("data/" + tiger_fn + ".shp")
     else:
         print("Reading shapefile from cache")
 
     # JOIN DEMOGRAPHIC DATA TO TRACT GEODATAFRAME
     geo = pd.merge(geo_tract, df, left_on = ["STATEFP", "COUNTYFP","TRACTCE"], right_on = ["state", "county", "tract"])
     # EXPORT SHAPEFILE FOR CHAIN
-    geo.to_file("data/" + st + "_" + year + "_tract.gpkg", driver="GPKG")
-
+    #geo.to_file("data/" + st + "_" + year + "_tract.gpkg", driver="GPKG")
+    geo.to_file("data/" + st + "_" + year + "_tract.shp")
 if __name__ == "__main__":
     tract_data_prep('GA', 2012)

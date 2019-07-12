@@ -10,7 +10,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 
 precincts = gpd.read_file("./GA_precincts16/GA_precincts16.shp")
-tracts = gpd.read_file("./data/ga_tract.shp")
+tracts = gpd.read_file("./data/ga_2012_tract.shp")
 
 tracts = tracts.to_crs(precincts.crs)
 
@@ -39,5 +39,5 @@ tracts[variables] = maup.prorate(
         weights.iloc[weights.nonzero()[0]]
         )
 
-precincts.to_file("ga_tract_precinct")
+precincts.to_file("ga_2012_tract_precinct")
 
