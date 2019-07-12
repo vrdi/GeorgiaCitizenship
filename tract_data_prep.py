@@ -72,13 +72,13 @@ def tract_data_prep(st, year, cache = True):
     
     #Loop over races to get CVAP counts and append to a dataframe. 
     get_var=[]
-    df_col_names = ["MVAP", "MNVVAP", "MNLVAP", "FVAP", "FNVVAP","FNLVAP"]
+    df_col_names = ["MU18","MNVU18","MNLU18","MVAP", "MNVVAP", "MNLVAP", "FU18","FNVU18","FNLU18","FVAP","FNVVAP","FNLVAP"]
     geoid_col_names = ['state', 'county', 'tract']
     # ga_tract = pd.DataFrame(columns = geoid_col_names) # Assigned but not used?
         
     for race in races:
         get_var= ["B05003" + str(race) + "_" + str(i+1).zfill(3) 
-                  + "E" for i in range(23) if i+1 in [8, 9, 11, 19, 20,22] ]
+                  + "E" for i in range(23) if i+1 in [3,4,6,8, 9, 11,14,15,17, 19, 20, 22] ]
         print(get_var)
     
         predicates = {}
