@@ -117,7 +117,7 @@ def cd_data_prep(st, year, cache = True):
     df.to_pickle("data/df_" + st + "_" + year + ".pickle")    
     
     # Download Census Congressional District- TigerLine File for requested state and year    
-    tiger_fn = "tl_" + year + "_us_cd112"
+    tiger_fn = "tl_" + year + "_us_cd1" + year[-2:]
     try:
         geo_cd = gpd.read_file("data/" + tiger_fn + ".shp")
     except:
@@ -129,10 +129,10 @@ def cd_data_prep(st, year, cache = True):
         print("Reading shapefile from cache")
 
     # JOIN DEMOGRAPHIC DATA TO TRACT GEODATAFRAME
-    geo = pd.merge(geo_cd, df, left_on = ["STATEFP", "CD112FP"], right_on = ["state", "congressional district"])
+    geo = pd.merge(geo_cd, df, left_on = ["STATEFP", "CD1"+year[-2:]+"FP"], right_on = ["state", "congressional district"])
     # EXPORT SHAPEFILE FOR CHAIN
     #geo.to_file("data/" + st + "_" + year + "_CD.gpkg", driver="GPKG")
     geo.to_file("data/" + st + "_" + year + "_CD.shp")
 
 if __name__ == "__main__":
-    cd_data_prep('GA', 2012)
+    cd_data_prep('GA', 2013)
