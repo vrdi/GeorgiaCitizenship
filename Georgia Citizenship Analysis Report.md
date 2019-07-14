@@ -58,6 +58,9 @@ Citizenship data was collected at the block group level from the Census special 
 # Question 1 and results
 How does minority representation look along four variables- Total Population, Voting Age Population, Citizen Population, and Citizen Age Population? This question becomes even more crucial when considering the upcoming 2020 Census, and the continued debate on whether a citizenship question should be included on the form. Georgia has the highest growing Latino population in the country, and while not uniform, African-Americans and Latinos do tend to vote in a consensus, especially in key elections. 
 We conducted runs on U.S Congressional districts- Georgia currently has 14. We also found that if districts are conducted based on citizenship or citizenship voting age population, Georgia would lose 1 Congressional seat. 
+
+Results 
+
 # Question 2 and results
 
 
