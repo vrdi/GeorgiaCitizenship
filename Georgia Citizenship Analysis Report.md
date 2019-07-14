@@ -1,3 +1,4 @@
+
 ---
 title: Georgia Citizenship Project
 author: 
@@ -51,6 +52,8 @@ Before running chains on both the census tract and block group level we first ob
 ## Census Tracts
 
 ## Block Groups
+Citizenship data was collected at the block group level from the Census special tabulation method: the ACS 5 year estimates. Of particular interest is the tabulations by race and ethnicity since Georgia has a sizeable immigrant population, landing at 10%. The following groups of interest were considered in our tabulation: Hispanic and Non-Hispanic (alone), as well as White alone, Black alone, Asian alone, American Indian and Native Alaskan alone, Native Hawaiian and Pacific Islander alone, and 2 or more races. One advantage of using block groups with which to aggregating precinct partisan information is the resolution of our analysis. We transformed this data from the original csv, in which each observation is a ethnicity within a block group, to citizen voting age counts by by block groups. 
+
 
 # Question 1 and results
 How does minority representation look along four variables- Total Population, Voting Age Population, Citizen Population, and Citizen Age Population? This question becomes even more crucial when considering the upcoming 2020 Census, and the continued debate on whether a citizenship question should be included on the form. Georgia has the highest growing Latino population in the country, and while not uniform, African-Americans and Latinos do tend to vote in a consensus, especially in key elections. 
