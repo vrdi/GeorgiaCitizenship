@@ -47,7 +47,7 @@ Census special tabulation
 Investigation of Administrative sources
 
 # Data Preparation
-
+Before running chains on both the census tract and block group level we first obtained the necessary demographic data from the Census Bureau's American Community Survey (ACS). This demographic data incudes population counts across races, hispanic ethnicity, sex, citizenship and age. We then joined this data with the block group tigerline Georgia shapefile and census tract tigerline Georgia shapefile separately. Our goal within this data prepraration process was to generalize our code so that future research could easily be conducted using different demographic data or by analyzing another state.
 ## Census Tracts
 
 ## Block Groups
