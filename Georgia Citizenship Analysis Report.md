@@ -1,4 +1,3 @@
-
 ---
 title: Georgia Citizenship Project
 author: 
@@ -24,7 +23,7 @@ Georgia is a state with dynamic political opportunity. The party split is curren
 # National Apportionment
 Details here
 
-#Prisoner Reallocation
+# Prisoner Reallocation
 Summary: Research was conducted on the availability of prisoner's origins and their current residence. Prisoner reallocation varies across states, with California randomly reassigning prisoners across geographies. In Georgia, inmates are counted towards the population count of the district/county they are incarcerated in, not their county of origin. In 2010, there were 20,213 inmates in the Department of Corrections. The American Community Survey does not provide county of origin for the incarcerated population, so pulling together different data sources was necessary.
 
 Data on prisoner origins is made available on the county level by the Georgia Department of Corrections(GDC). 
