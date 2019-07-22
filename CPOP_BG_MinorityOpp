@@ -1,0 +1,238 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jul 12 11:39:10 2019
+
+@author: bwhite2
+"""
+
+Clean Code
+
+import csv
+import os
+from functools import partial
+import json
+import numpy as np
+import geopandas as gpd
+import matplotlib
+
+import matplotlib.pyplot as plt
+#import seaborn as sns
+import networkx as nx
+import random
+
+
+from gerrychain import (
+    Election,
+    Graph,
+    MarkovChain,
+    Partition,
+    accept,
+    constraints,
+    updaters,
+)
+from gerrychain.metrics import efficiency_gap, mean_median, partisan_gini
+from gerrychain.proposals import recom, propose_random_flip
+from gerrychain.updaters import cut_edges
+from gerrychain.tree import recursive_tree_part
+from gerrychain.accept import always_accept
+
+
+# In[60]:
+
+##Convert to geopackage 
+num_districts = 14
+output_dirname = "Run_1"
+
+newdir = "./Outputs/"
+os.makedirs(os.path.dirname(newdir + "init.txt"), exist_ok=True)
+with open(newdir + "init.txt", "w") as f:
+    f.write("Created Folder")
+    
+graph = Graph.from_json("/Users/bwhite2/GeorgiaCitizenship/ga_2012_BG.json")
+df = gpd.read_file("/Users/bwhite2/GeorgiaCitizenship/ga_2012_bgs.gpkg")
+
+
+# In[73]:
+
+
+# SUMMING DATA WE WANT IN THE DATAFRAME
+#CPOP Total
+CPOP TOTAL: CIT_EST TOT
+CVAP TOTAL: CVAP_EST TOT
+BCVAP : CVAP_EST NH_BLACK
+BCPOP: CIT_EST NH_BLACK
+HCVAP:CVAP_EST HISP
+HCPOP:CIT_EST HISP
+
+new_cols = ['CPOP', 'CVAP', 'BCVAP', 'BCPOP', 'HCVAP', 'HCPOP', 'minCPOP']
+
+
+CPOP_cols = ['CIT_EST TOT', ]
+CVAP_cols = ['CVAP_EST TOT', ]
+BCVAP_cols = ['CVAP_EST NH_BLACK', ]
+BCPOP_cols = ['CIT_EST NH_BLACK', ]
+HCVAP_cols = ['CVAP_EST HISP', ]
+HCPOP_cols = ['CIT_EST HISP', ]
+
+
+df['CPOP'] = pd.to_numeric(df['CIT_EST TOT'])
+df['CVAP'] = pd.to_numeric(df['CVAP_EST TOT'])
+df['BCVAP'] = pd.to_numeric(df['CVAP_EST NH_BLACK'])
+df['BCPOP'] = pd.to_numeric(df['CIT_EST NH_BLACK'])
+df['HCVAP'] = pd.to_numeric(df['CVAP_EST HISP'])
+df['HCPOP'] = pd.to_numeric(df['CIT_EST HISP'])
+
+df['nBCVAP'] = df['CVAP'] - df['BCVAP']
+df['nBCPOP'] = df['CPOP'] - df['BCPOP']
+df['minCPOP'] = df['BCPOP'] + df['HCPOP']
+
+# ADD NEW DATA TO GRAPH 
+
+graph.add_data(df, columns=new_cols)
+# INITIAL PARTITION ASSIGNMENT USING RECURSIVE TREE PARTITION
+
+starts = []
+
+for i in range(1):
+    starts.append(recursive_tree_part(graph,range(num_districts),df['CPOP'].sum()/num_districts, "CPOP", .001, 1))
+
+updater = {
+    "population": updaters.Tally("CPOP", alias="population"),
+    "cut_edges": cut_edges,
+    "minCPOP":Election("minCPOP", {"minCPOP":"minCPOP"})}
+
+initial_partitions = []
+proposals = []
+compactness_bounds = []
+chains=[]
+
+for i in range(1):
+    initial_partitions.append(Partition(graph,starts[i], updater))
+    print("initial partition is made")
+
+    proposals.append(partial(
+        recom, pop_col="CPOP", pop_target=df['CPOP'].sum()/num_districts, epsilon=0.01, node_repeats=1 # e = .02
+    ))
+
+    compactness_bounds.append(constraints.UpperBound(
+        lambda p: len(p["cut_edges"]), 2 * len(initial_partitions[i]["cut_edges"])
+    ))
+
+    chains.append(MarkovChain(
+        proposal=proposals[i],
+        constraints=[
+            constraints.within_percent_of_ideal_population(initial_partitions[i], .01), compactness_bounds[i] # e = .05
+          #constraints.single_flip_contiguous#no_more_discontiguous 
+        #constraints.within_percent_of_ideal_population(initial_partitions[i], .3)
+        ],
+        accept=always_accept,
+        initial_state=initial_partitions[i],
+        total_steps=10000
+    ))
+
+
+# In[ ]:
+
+
+cuts=[[],[],[],[]]
+minCPOP=[[],[],[],[]]
+
+# Minority opportunity district in GA- Combined Black & Latino CPOP
+
+for i in range(1):
+    t = 0
+    for part in chains[i]:
+        cuts[i].append(len(part["cut_edges"]))
+        minCPOP[i].append(sorted(part["minCPOP"].percents("minCPOP")))
+        t+=1
+    
+        if t%100 ==0:
+            print("chain",i,"step",t)
+            
+            df["current"]=df.index.map(dict(part.assignment))
+        
+            df.plot(column="current",cmap="jet")
+            plt.close()
+
+            with open(newdir+"assignment"+str(t)+".json", 'w') as jf1:
+                json.dump(dict(part.assignment), jf1)
+    
+    print(f"finished chain {i}")
+
+df["final"]=df.index.map(dict(part.assignment))
+
+df.plot(column="final",cmap="jet")
+plt.savefig(newdir+"final.png")
+plt.close()
+
+
+# PLOT SORTED DISTRICTS OVER minCPOP %
+
+c='k'
+
+# opportunity district minCPOP range in GA
+
+plt.figure()
+plt.boxplot(
+            np.array(minCPOP[0]),
+            whis=[1, 99],
+            showfliers=False,
+            patch_artist=True,
+            boxprops=dict(facecolor="None", color=c),
+            capprops=dict(color=c),
+            whiskerprops=dict(color=c),
+            flierprops=dict(color=c, markeredgecolor=c),
+            medianprops=dict(color=c),
+)
+
+#plt.plot([1,2,3,4,5,6,7],[.233,.268,.268,.297,.322,.337,.621], 'o', color="hotpink", label="Enacted",markersize=10)
+
+plt.axhline(y=.4,color='r',label="40%",linewidth=5)
+
+plt.axhline(y=.45,color='y',label="45%",linewidth=5)
+
+plt.axhline(y=.5,color='g',label="50%",linewidth=5)
+plt.plot([],[],color='k',label="ReCom Ensemble")
+plt.xlabel("Sorted Districts")
+plt.ylabel("minCPOP%")
+
+plt.legend()
+
+plt.show()
+
+
+# PLOT SORTED DISTRICTS OVER CPOP %
+
+plt.figure()
+plt.boxplot(
+            np.array(CPOP[0]),
+            whis=[1, 99],
+            showfliers=False,
+            patch_artist=True,
+            boxprops=dict(facecolor="None", color=c),
+            capprops=dict(color=c),
+            whiskerprops=dict(color=c),
+            flierprops=dict(color=c, markeredgecolor=c),
+            medianprops=dict(color=c),
+)
+
+#plt.plot([1,2,3,4,5,6,7],[.233,.268,.268,.297,.322,.337,.621], 'o', color="hotpink", label="Enacted",markersize=10)
+
+plt.axhline(y=.4,color='r',label="40%",linewidth=5)
+
+plt.axhline(y=.45,color='y',label="45%",linewidth=5)
+
+plt.axhline(y=.5,color='g',label="50%",linewidth=5)
+plt.plot([],[],color='k',label="ReCom Ensemble")
+plt.xlabel("Sorted Districts")
+plt.ylabel("CPOP%")
+
+plt.legend()
+
+plt.show()
+
+
+# In[ ]:
+
+

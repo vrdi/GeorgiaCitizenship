@@ -45,8 +45,19 @@ ga_data['GEOID'] = ga_data['GEOID'].map(lambda x: str(x)[7:])
 #attach to the shapefile 
 # This also needs to be downloaded
 # Make sure year matches what you've downloaded
+# 
 df = geopandas.read_file("tl_2012_13_bg.shp")
 
 geo = pd.merge(df, ga_data, left_on= ['GEOID'], right_on =['GEOID'])
 
-geo.to_file("data/ga_2012_bgs.gpkg", driver="GPKG")
+geo.to_file("data/ga_2012_BG.shp")
+geo.to_file("ga_2012_bgs.gpkg", driver="GPKG")
+
+# make dual graph
+graph = Graph.from_geodataframe(geo) 
+graph.add_data(geo, columns = geo.columns )
+graph.to_json("ga_2012_BG.json")
+
+
+
+

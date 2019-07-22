@@ -1,4 +1,4 @@
-﻿---
+---
 title: Notes on the administrative record about the 2020 census citizenship question
 author: Brian Morris
 date: July 10, 2019
