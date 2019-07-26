@@ -1,5 +1,19 @@
 # -*- coding: utf-8 -*-
 """
+Created on Thu Jul 25 10:19:41 2019
+
+@author: Katherine
+"""
+
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jul 24 16:35:30 2019
+
+@author: Katherine
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Fri Jul 12 11:18:24 2019
 
 @author: Katherine
@@ -15,7 +29,7 @@ Created on Thu Jul 11 15:06:44 2019
 # Imports
 
 import os
-
+import json
 from gerrychain import Graph, GeographicPartition, Partition, Election, accept
 from gerrychain.updaters import Tally, cut_edges
 import geopandas as gpd
@@ -67,7 +81,8 @@ pop_col = "TOTPOP"
 df["CPOP"] = df["TOTPOP"]-df["NCPOP"]
 ccol = "CPOP"
 uid = "ID"
-
+df["CVAP"]= df["MNVVAPTOT"]+df["MNLVAPTOT"]+df["FNVVAPTOT"]+df["FNLVAPTOT"]
+CVAP = "CVAP"
 num_districts = 14
 
 
@@ -81,70 +96,31 @@ elections = [
         Election("SEN16",{"Democratic": "SEN16D","Republican":"SEN16R" })]
 
 #my_updaters = {"population" : updaters.Tally("TOTPOP", alias="population")}
-my_updaters = {"population" : Tally(pop_col, alias="population"), "cpop": Tally(ccol, alias="cpop"),
+my_updaters = {"population" : Tally(pop_col, alias="population"), "CVAP": Tally(CVAP, alias="CVAP"), "cpop": Tally(ccol, alias="cpop"),
             "cut_edges": cut_edges}
 election_updaters = {election.name: election for election in elections}
 my_updaters.update(election_updaters)
 
 tot_pop_col = 0
 tot_ccol = 0
-#for tallying over totpop:
-#for n in graph.nodes():
-#    graph.node[n][pop_col] = int(graph.node[n][pop_col])
-#    tot_pop_col += graph.node[n][pop_col]
-
-#cddict = recursive_tree_part(graph,range(num_districts),tot_pop_col/num_districts,pop_col,0.01,1)
-
-#starting_partition = Partition(graph,assignment=cddict,updaters=my_updaters)
-#for tallying over citizen pop:
+tot_CVAP = 0
+#for tallying over CVAP:
 for n in graph.nodes():
-    graph.node[n][ccol] = int(graph.node[n][ccol])
-    tot_ccol += graph.node[n][ccol]
+    graph.node[n][CVAP] = int(graph.node[n][CVAP])
+    tot_CVAP += graph.node[n][CVAP]
 
-cddict = recursive_tree_part(graph,range(num_districts),tot_ccol/num_districts,ccol,0.01,1)
+cddict = recursive_tree_part(graph,range(num_districts),tot_CVAP/num_districts,CVAP,0.01,1)
 
 starting_partition = Partition(graph,assignment=cddict,updaters=my_updaters)
-# =============================================================================
-# 
-# starting_partition = GeographicPartition(
-#     graph,
-#     assignment="GOV",
-#     updaters={
-#         "polsby_popper" : polsby_popper,
-#         "cut_edges": cut_edges,
-#         "population": Tally(pop_col, alias="population"),
-# 
-#     }
-# )
-# 
-# =============================================================================
+
+
 
 #-------------------------------------------------------------------------------------------
 
 #CHAIN FOR TOTPOP
-#proposal = partial(
- #       recom, pop_col=pop_col, pop_target=tot_pop_col/num_districts, epsilon=0.02, node_repeats=1
-  #  )
-
-#compactness_bound = constraints.UpperBound(
- #       lambda p: len(p["cut_edges"]), 2 * len(starting_partition["cut_edges"])
- #   )
-
-#chain = MarkovChain(
- #       proposal,
-  #      constraints=[
-   #         constraints.within_percent_of_ideal_population(starting_partition, 0.10),compactness_bound
-          #constraints.single_flip_contiguous#no_more_discontiguous
-    #    ],
-     #   accept=accept.always_accept,
-      #  initial_state=starting_partition,
-       # total_steps=2000
-    #)
-#CHAIN FOR CPOP
-
 proposal = partial(
-        recom, pop_col=ccol, pop_target=tot_ccol/num_districts, epsilon=0.02, node_repeats=1
-    )
+        recom, pop_col=CVAP, pop_target=tot_CVAP/num_districts, epsilon=0.02, node_repeats=1
+   )
 
 compactness_bound = constraints.UpperBound(
         lambda p: len(p["cut_edges"]), 2 * len(starting_partition["cut_edges"])
@@ -152,8 +128,8 @@ compactness_bound = constraints.UpperBound(
 
 chain = MarkovChain(
         proposal,
-        constraints=[
-            constraints.within_percent_of_ideal_population(starting_partition, 0.10),compactness_bound
+         constraints=[
+            constraints.within_percent_of_ideal_population(starting_partition, 0.14),compactness_bound
           #constraints.single_flip_contiguous#no_more_discontiguous
         ],
         accept=accept.always_accept,
@@ -174,7 +150,29 @@ for part in chain:
     if t % 100 == 0:
         print("finished chain " + str(t))
         
+outputdir = './Outputs/'
+obj = {"CVAP_based_Rseats_sen" : list(SENwins_list)}
 
+with open(outputdir+"CD14_CVAP_based_Rseats_sen.json", 'w') as jf1:
+    json.dump(dict(obj), jf1)
+
+outputdir = './Outputs/'
+obj = {"CVAP_based_Rseats_pres" : list(PRESwins_list)}
+
+with open(outputdir+"CD14_CVAP_based_Rseats_pres.json", 'w') as jf1:
+    json.dump(dict(obj), jf1)
+    
+plt.figure()
+plt.style.use('seaborn-deep')
+
+colors = ['green', 'goldenrod']
+labels= ['TOTPOP SEN16', 'CVAP SEN16']
+
+plt.hist([TOTPOP_SENwins_list, CVAP_SENwins_list],label=labels, color=colors)
+plt.legend(loc='upper right')
+plt.show()
+
+ 
 #CHANGE
 plt.figure()
 plt.hist(SENwins_list)

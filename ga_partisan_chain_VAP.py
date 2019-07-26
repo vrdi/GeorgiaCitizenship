@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jul 12 11:18:24 2019
-
-@author: Katherine
-"""
 
 # -*- coding: utf-8 -*-
 """
@@ -67,7 +61,7 @@ pop_col = "TOTPOP"
 df["CPOP"] = df["TOTPOP"]-df["NCPOP"]
 ccol = "CPOP"
 uid = "ID"
-
+VAP = "VAP"
 num_districts = 14
 
 
@@ -81,70 +75,29 @@ elections = [
         Election("SEN16",{"Democratic": "SEN16D","Republican":"SEN16R" })]
 
 #my_updaters = {"population" : updaters.Tally("TOTPOP", alias="population")}
-my_updaters = {"population" : Tally(pop_col, alias="population"), "cpop": Tally(ccol, alias="cpop"),
+my_updaters = {"population" : Tally(pop_col, alias="population"), "VAP": Tally(VAP, alias="VAP"), "cpop": Tally(ccol, alias="cpop"),
             "cut_edges": cut_edges}
 election_updaters = {election.name: election for election in elections}
 my_updaters.update(election_updaters)
 
 tot_pop_col = 0
 tot_ccol = 0
-#for tallying over totpop:
-#for n in graph.nodes():
-#    graph.node[n][pop_col] = int(graph.node[n][pop_col])
-#    tot_pop_col += graph.node[n][pop_col]
-
-#cddict = recursive_tree_part(graph,range(num_districts),tot_pop_col/num_districts,pop_col,0.01,1)
-
-#starting_partition = Partition(graph,assignment=cddict,updaters=my_updaters)
-#for tallying over citizen pop:
+tot_VAP = 0
+#for tallying over VAP:
 for n in graph.nodes():
-    graph.node[n][ccol] = int(graph.node[n][ccol])
-    tot_ccol += graph.node[n][ccol]
+    graph.node[n][VAP] = int(graph.node[n][VAP])
+    tot_VAP += graph.node[n][VAP]
 
-cddict = recursive_tree_part(graph,range(num_districts),tot_ccol/num_districts,ccol,0.01,1)
+cddict = recursive_tree_part(graph,range(num_districts),tot_VAP/num_districts,VAP,0.01,1)
 
 starting_partition = Partition(graph,assignment=cddict,updaters=my_updaters)
-# =============================================================================
-# 
-# starting_partition = GeographicPartition(
-#     graph,
-#     assignment="GOV",
-#     updaters={
-#         "polsby_popper" : polsby_popper,
-#         "cut_edges": cut_edges,
-#         "population": Tally(pop_col, alias="population"),
-# 
-#     }
-# )
-# 
-# =============================================================================
 
 #-------------------------------------------------------------------------------------------
 
 #CHAIN FOR TOTPOP
-#proposal = partial(
- #       recom, pop_col=pop_col, pop_target=tot_pop_col/num_districts, epsilon=0.02, node_repeats=1
-  #  )
-
-#compactness_bound = constraints.UpperBound(
- #       lambda p: len(p["cut_edges"]), 2 * len(starting_partition["cut_edges"])
- #   )
-
-#chain = MarkovChain(
- #       proposal,
-  #      constraints=[
-   #         constraints.within_percent_of_ideal_population(starting_partition, 0.10),compactness_bound
-          #constraints.single_flip_contiguous#no_more_discontiguous
-    #    ],
-     #   accept=accept.always_accept,
-      #  initial_state=starting_partition,
-       # total_steps=2000
-    #)
-#CHAIN FOR CPOP
-
 proposal = partial(
-        recom, pop_col=ccol, pop_target=tot_ccol/num_districts, epsilon=0.02, node_repeats=1
-    )
+        recom, pop_col=VAP, pop_target=tot_VAP/num_districts, epsilon=0.02, node_repeats=1
+   )
 
 compactness_bound = constraints.UpperBound(
         lambda p: len(p["cut_edges"]), 2 * len(starting_partition["cut_edges"])
@@ -152,8 +105,8 @@ compactness_bound = constraints.UpperBound(
 
 chain = MarkovChain(
         proposal,
-        constraints=[
-            constraints.within_percent_of_ideal_population(starting_partition, 0.10),compactness_bound
+         constraints=[
+            constraints.within_percent_of_ideal_population(starting_partition, 0.12),compactness_bound
           #constraints.single_flip_contiguous#no_more_discontiguous
         ],
         accept=accept.always_accept,
@@ -198,14 +151,3 @@ plt.xlabel("Cut Edges")
 plt.show()
 
 
-#print(moon_score(starting_partition))
-#print(list(starting_partition.assignment.keys()))
-#print([n for n in graph.nodes if n not in starting_partition.assignment])
-#print(df["VTD"])
-#print(starting_partition["cut_edges"])
-
-
-#d = county_splits_dict(starting_partition)
-#print(cut_edges_in_county(starting_partition))
-#print(cut_edges_in_district(starting_partition))
-#sum( [ len([ dd for dd  in [dict(v) for v in d.values()] if k in dd.keys()]) > 1 for k in counties]    )
