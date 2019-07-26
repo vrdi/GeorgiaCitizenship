@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Wed Jul 24 16:35:30 2019
+
+@author: Katherine
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Fri Jul 12 11:18:24 2019
 
 @author: Katherine
@@ -89,21 +96,21 @@ my_updaters.update(election_updaters)
 tot_pop_col = 0
 tot_ccol = 0
 #for tallying over totpop:
-#for n in graph.nodes():
-#    graph.node[n][pop_col] = int(graph.node[n][pop_col])
-#    tot_pop_col += graph.node[n][pop_col]
-
-#cddict = recursive_tree_part(graph,range(num_districts),tot_pop_col/num_districts,pop_col,0.01,1)
-
-#starting_partition = Partition(graph,assignment=cddict,updaters=my_updaters)
-#for tallying over citizen pop:
 for n in graph.nodes():
-    graph.node[n][ccol] = int(graph.node[n][ccol])
-    tot_ccol += graph.node[n][ccol]
+    graph.node[n][pop_col] = int(graph.node[n][pop_col])
+    tot_pop_col += graph.node[n][pop_col]
 
-cddict = recursive_tree_part(graph,range(num_districts),tot_ccol/num_districts,ccol,0.01,1)
+cddict = recursive_tree_part(graph,range(num_districts),tot_pop_col/num_districts,pop_col,0.01,1)
 
 starting_partition = Partition(graph,assignment=cddict,updaters=my_updaters)
+#for tallying over citizen pop:
+#for n in graph.nodes():
+ #   graph.node[n][ccol] = int(graph.node[n][ccol])
+  #  tot_ccol += graph.node[n][ccol]
+
+#cddict = recursive_tree_part(graph,range(num_districts),tot_ccol/num_districts,ccol,0.01,1)
+
+#starting_partition = Partition(graph,assignment=cddict,updaters=my_updaters)
 # =============================================================================
 # 
 # starting_partition = GeographicPartition(
@@ -122,29 +129,9 @@ starting_partition = Partition(graph,assignment=cddict,updaters=my_updaters)
 #-------------------------------------------------------------------------------------------
 
 #CHAIN FOR TOTPOP
-#proposal = partial(
- #       recom, pop_col=pop_col, pop_target=tot_pop_col/num_districts, epsilon=0.02, node_repeats=1
-  #  )
-
-#compactness_bound = constraints.UpperBound(
- #       lambda p: len(p["cut_edges"]), 2 * len(starting_partition["cut_edges"])
- #   )
-
-#chain = MarkovChain(
- #       proposal,
-  #      constraints=[
-   #         constraints.within_percent_of_ideal_population(starting_partition, 0.10),compactness_bound
-          #constraints.single_flip_contiguous#no_more_discontiguous
-    #    ],
-     #   accept=accept.always_accept,
-      #  initial_state=starting_partition,
-       # total_steps=2000
-    #)
-#CHAIN FOR CPOP
-
 proposal = partial(
-        recom, pop_col=ccol, pop_target=tot_ccol/num_districts, epsilon=0.02, node_repeats=1
-    )
+        recom, pop_col=pop_col, pop_target=tot_pop_col/num_districts, epsilon=0.02, node_repeats=1
+   )
 
 compactness_bound = constraints.UpperBound(
         lambda p: len(p["cut_edges"]), 2 * len(starting_partition["cut_edges"])
@@ -152,7 +139,7 @@ compactness_bound = constraints.UpperBound(
 
 chain = MarkovChain(
         proposal,
-        constraints=[
+         constraints=[
             constraints.within_percent_of_ideal_population(starting_partition, 0.10),compactness_bound
           #constraints.single_flip_contiguous#no_more_discontiguous
         ],
@@ -160,6 +147,26 @@ chain = MarkovChain(
         initial_state=starting_partition,
         total_steps=10000
     )
+#CHAIN FOR CPOP
+
+#proposal = partial(
+ #       recom, pop_col=ccol, pop_target=tot_ccol/num_districts, epsilon=0.02, node_repeats=1
+  #  )
+
+#compactness_bound = constraints.UpperBound(
+ #       lambda p: len(p["cut_edges"]), 2 * len(starting_partition["cut_edges"])
+  #  )
+
+#chain = MarkovChain(
+#        proposal,
+#        constraints=[
+ #           constraints.within_percent_of_ideal_population(starting_partition, 0.10),compactness_bound
+  #        #constraints.single_flip_contiguous#no_more_discontiguous
+   #     ],
+    #    accept=accept.always_accept,
+     #   initial_state=starting_partition,
+      #  total_steps=10000
+    #)
 
 
 t = 0
@@ -197,6 +204,29 @@ plt.xlabel("Cut Edges")
 #plt.savefig("PA_hist_symmetric_entropy_5000.png")
 plt.show()
 
+
+CVAP_PRESwins_list_data = ".\Outputs\CD14_CVAP_based_Rseats_pres.json"
+with open(CVAP_PRESwins_list_data) as f:
+    data = json.load(f)
+    CVAP_PRESwins_list = data["CVAP_based_Rseats_pres"]
+
+
+CVAP_SENwins_list_data = ".\Outputs\CD14_CVAP_based_Rseats_sen.json"
+
+with open(CVAP_SENwins_list_data) as f:
+    data = json.load(f)
+    CVAP_SENwins_list = data["CVAP_based_Rseats_sen"]
+
+
+plt.figure()
+plt.style.use('seaborn-deep')
+
+colors = ['pink', 'purple']
+labels= ['TOTPOP PRES16', 'CVAP PRES16']
+
+plt.hist([SENwins_list, CVAP_SENwins_list],label=labels, color=colors)
+plt.legend(loc='upper right')
+plt.show()
 
 #print(moon_score(starting_partition))
 #print(list(starting_partition.assignment.keys()))
