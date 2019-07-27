@@ -1,0 +1,26 @@
+##Title: Prison-Based Gerrymandering 
+#Author: Bri White
+#Date: July 10, 2019
+
+# Summary: Research was conducted on the availability of prisoner's origins and their current residence. Prisoner reallocation varies across states, with California randomly reassigning prisoners across geographies to lessen  In Georgia, inmates are counted towards the population count of district/county they are incarcerated in, not their county of origin. In 2010 there were 20,213 inmates in the Department of Corrections. The ACS does not provide county of origin for the incarcerated population, so pulling together different data sources was necessary. 
+There was also interest in finding point crime data for GA( either among large cities or on the neighborhood level, and seeing whether this information matches the ACS's group quarters data. 
+Data on prisoner origins is made available on the county level by the Georgia Department of Corrections(GDC). 
+
+Data Source(2010): http://www.dcor.state.ga.us/sites/all/files/pdf/Research/Annual/Profile_inmate_admissions_CY2010.pdf
+
+#Pg.11- Home County
+#Re: County of Origin & Inmate Processing 
+County of Origin- 
+1. Fulton County(2,160 inmates)  12.3% of total inmate population
+2. Dekalb County (1,157 inmates)	6.50%	of total inmate population
+3. Cobb County (1,075	inmates) 6.04%	of total inmate population
+** 2,401		unreported counties of origin
+-- Inquiry made with Georgia Department of Corrections for inmate origins for former addresses at time of conviction
+
+#Data Source: Census Bureau
+The Census Bureau provides information on the group quarter populations within Georgia. "Group quarter" refers to living quarters outside of traditional residencies. It includes those in both institutionalized and non-institutionalized settings. For prisoners, they are classified as residing in institutionalized residencies. The institutionalized group quarters statistics as a variable also include those in mental health facilities, as well as elderly care homes. 
+Institutionalized Group Quarters; Source: 2008-2012 5 Year Estimates
+Citizens:
+VAP: 143, 068
+
+
