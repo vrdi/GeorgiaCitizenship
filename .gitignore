@@ -1,6 +1,9 @@
 data/
 /.spyproject/
 Outputs/
+/.ipynb_checkpoints/
+__pycache__/
+.DS_store
 <<<<<<< HEAD
 
 =======
