@@ -148,3 +148,13 @@ seat_counts = pd.concat(
 
 print(seat_counts)
 
+# ====== Get states' shares of the total US state population under different methods of counting population ======
+
+pop_percents = pd.concat(
+        [pop_cit_data["name"]] + [100*pop_cit_data[col]/pop_cit_data[col].sum() for col in [
+                "tot_pop","cit_pop","VAP","CVAP"
+                ]],
+        axis = 1
+        )
+
+print(pop_percents)
