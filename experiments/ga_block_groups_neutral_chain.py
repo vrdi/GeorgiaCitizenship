@@ -1,16 +1,8 @@
 import argparse
-from gerrychain import Graph, GeographicPartition, Partition, Election, accept
-from gerrychain.updaters import Tally, cut_edges
-from gerrychain import MarkovChain
-from gerrychain.proposals import recom
-from gerrychain.accept import always_accept
-from gerrychain import constraints
 import geopandas as gpd
 import numpy as np
 from functools import partial
-from gerrychain.tree import recursive_tree_part
 import pickle
-import random
 
 ## Set up argument parser
 
@@ -28,6 +20,18 @@ parser.add_argument("popcol", metavar="population column", type=str,
 parser.add_argument("--i", metavar="run number", type=int, default=0,
                     help="which chain run is this?")
 args = parser.parse_args()
+
+from gerrychain.random import random
+random.seed(args.i)
+from gerrychain import Graph, GeographicPartition, Partition, Election, accept
+from gerrychain.updaters import Tally, cut_edges
+from gerrychain import MarkovChain
+from gerrychain.proposals import recom
+from gerrychain.accept import always_accept
+from gerrychain import constraints
+from gerrychain.tree import recursive_tree_part
+
+
 
 num_districts_in_map = {"congress" : 14,
                         "congress_2000" : 13,
@@ -99,6 +103,11 @@ else:
 
 init_partition = Partition(graph, assignment=cddict, updaters=ga_updaters)
 
+
+while(not constraints.within_percent_of_ideal_population(init_partition, EPS)(init_partition)):
+    cddict = recursive_tree_part(graph=graph, parts=range(NUM_DISTRICTS), 
+                                 pop_target=ideal_pop, pop_col=POP_COL, epsilon=EPS)
+    init_partition = Partition(graph, assignment=cddict, updaters=ga_updaters)
 
 
 ## Setup chain
