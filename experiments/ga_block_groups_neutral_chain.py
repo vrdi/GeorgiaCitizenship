@@ -25,6 +25,8 @@ parser.add_argument("n", metavar="iterations", type=int,
 parser.add_argument("popcol", metavar="population column", type=str,
                     choices=["TOTPOP", "VAP", "CPOP", "CVAP"],
                     help="the population column by which to balance redistricting")
+parser.add_argument("--i", metavar="run number", type=int, default=0,
+                    help="which chain run is this?")
 args = parser.parse_args()
 
 num_districts_in_map = {"congress" : 14,
@@ -37,7 +39,7 @@ epsilons = {"congress" : 0.01,
             "state_senate" : 0.02,
             "state_house" : 0.05} 
 
-POP_COL = args.popcol
+POP_COL = "{}18".format(args.popcol)
 NUM_DISTRICTS = num_districts_in_map[args.map]
 ITERS = args.n
 EPS = epsilons[args.map]
@@ -50,25 +52,25 @@ DEMO_COLS = ["TOTPOP", "VAP", "CPOP", "CVAP",
 
 print("Reading in Data/Graph")
 
-with open("GA_blockgroup_graph.p", "rb") as f_in:
+with open("../graphs/GA_blockgroup_graph.p", "rb") as f_in:
     graph = pickle.load(f_in)
 
 
 ga_updaters = {"population" : Tally(POP_COL, alias="population"),
                "cut_edges": cut_edges,
-               "TOTPOP": Tally("TOTPOP18"),
-               "VAP": Tally("VAP18"),
-               "CPOP": Tally("CPOP18"),
-               "CVAP": Tally("CVAP18"),
-               "BPOP": Tally("NH_BLACK18"),
-               "HPOP": Tally("HISP18"),
-               "WPOP": Tally("NH_WHITE18"),
-               "BCPOP": Tally("BCPOP18"),
-               "HCPOP": Tally("HCPOP18"),
-               "WCPOP": Tally("WCPOP18"),
-               "BCVAP": Tally("BCVAP18"),
-               "HCVAP": Tally("HCVAP18"),
-               "WCVAP": Tally("WCVAP18"),
+               "TOTPOP": Tally("TOTPOP18", alias="TOTPOP"),
+               "VAP": Tally("VAP18", alias="VAP"),
+               "CPOP": Tally("CPOP18", alias="CPOP"),
+               "CVAP": Tally("CVAP18", alias="CVAP"),
+               "BPOP": Tally("NH_BLACK18", alias="BPOP"),
+               "HPOP": Tally("HISP18", alias="HPOP"),
+               "WPOP": Tally("NH_WHITE18", alias="WPOP"),
+               "BCPOP": Tally("BCPOP18", alias="BCPOP"),
+               "HCPOP": Tally("HCPOP18", alias="HCPOP"),
+               "WCPOP": Tally("WCPOP18", alias="WCPOP"),
+               "BCVAP": Tally("BCVAP18", alias="BCVAP"),
+               "HCVAP": Tally("HCVAP18", alias="HCVAP"),
+               "WCVAP": Tally("WCVAP18", alias="WCVAP"),
                "BPOP_perc": lambda p: {k: (v / p["TOTPOP"][k]) for k, v in p["BPOP"].items()},
                "HPOP_perc": lambda p: {k: (v / p["TOTPOP"][k]) for k, v in p["HPOP"].items()},
                "WPOP_perc": lambda p: {k: (v / p["TOTPOP"][k]) for k, v in p["WPOP"].items()},
@@ -85,7 +87,7 @@ ga_updaters = {"population" : Tally(POP_COL, alias="population"),
 
 print("Creating seed plan")
 
-total_pop = sum(df[POP_COL])
+total_pop = sum([graph.nodes[n][POP_COL] for n in graph.nodes])
 ideal_pop = total_pop / NUM_DISTRICTS
 
 if args.map != "state_house":
@@ -138,7 +140,7 @@ def tract_chain_results(data, part, i):
         data[c] = sorted(part[c].values())
 
 
-def update_saved_parts(parts, part, elections, i):
+def update_saved_parts(parts, part):
     parts["samples"].append(part.assignment)
 
 chain_results, parts = init_chain_results()
@@ -146,7 +148,6 @@ chain_results, parts = init_chain_results()
 for i, part in enumerate(chain):
     chain_results["cutedges"][i] = len(part["cut_edges"])
     tract_chain_results(chain_results, part, i)
-    update_saved_parts(parts, part, i)
 
     if i % (ITERS / 10) == 99: update_saved_parts(parts, part)
     if i % 1000 == 0: print("*", end="", flush=True)
@@ -156,8 +157,8 @@ print()
 
 print("Saving results")
 
-output = "/cluster/tufts/mggg/jmatth03/Georgia/GA_blockgroups_{}_{}_{}.p".format(args.map, POP_COL, ITERS)
-output_parts = "/cluster/tufts/mggg/jmatth03/Georgia/GA_blockgroups_{}_{}_{}_parts.p".format(args.map, POP_COL, ITERS)
+output = "/cluster/tufts/mggg/jmatth03/Georgia/GA_blockgroups_{}_{}_{}_{}.p".format(args.map, POP_COL, ITERS, args.i)
+output_parts = "/cluster/tufts/mggg/jmatth03/Georgia/GA_blockgroups_{}_{}_{}_{}_parts.p".format(args.map, POP_COL, ITERS, args.i) 
 
 with open(output, "wb") as f_out:
     pickle.dump(chain_results, f_out)
